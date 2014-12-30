@@ -65,7 +65,7 @@ namespace szlibInfoThreads
                                     else
                                     {
                                         //读取主题页面
-                                        string contentHTML = baiduThread.Fetch(topicurl);
+                                        string contentHTML = getWebContent.Fetch(topicurl);
                                         contentHTML = Regex.Replace(contentHTML, "\\s{3,}", "");
                                         contentHTML = contentHTML.Replace("\r", "");
                                         contentHTML = contentHTML.Replace("\n", "");
@@ -116,7 +116,7 @@ namespace szlibInfoThreads
                                         time = Regex.Replace(time, "\\s{2,}", " ");
                                     }
                                     //读取主题页面
-                                    string contentHTML = baiduThread.Fetch(topicurl);
+                                    string contentHTML = getWebContent.Fetch(topicurl);
                                     contentHTML = Regex.Replace(contentHTML, "\\s{3,}", "");
                                     contentHTML = contentHTML.Replace("\r", "");
                                     contentHTML = contentHTML.Replace("\n", "");
@@ -180,8 +180,8 @@ namespace szlibInfoThreads
         {
             List<string> topiclist = new List<string>();
             String[] webcontent=new String[2];
-            webcontent[0] = baiduThread.Fetch(tsg_url);
-            webcontent[1] = baiduThread.Fetch(st_url);
+            webcontent[0] = getWebContent.Fetch(tsg_url);
+            webcontent[1] = getWebContent.Fetch(st_url);
             foreach (string content in webcontent)
             {
                 string html = Regex.Replace(content, "\\s{3,}", "");

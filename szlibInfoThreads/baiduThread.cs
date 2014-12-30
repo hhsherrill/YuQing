@@ -38,9 +38,8 @@ namespace szlibInfoThreads
             while (true){
                 try
                 {
-                    baiduThread baidu = (baiduThread)data;
                     //获取页面
-                    string webcontent = Fetch(m_url);
+                    string webcontent = getWebContent.Fetch(m_url);
                     //获取新闻列表
                     List<string> newslist = getNews(webcontent);
                     foreach (string news in newslist)
@@ -81,10 +80,10 @@ namespace szlibInfoThreads
                                 {
                                     SQLServerUtil.updateReprint(SQLServerUtil.existNewsTitle(newstitle), source, time);
                                 }
-                                //标题不存在，添加到库里
+                                //标题不存在，添加到库里（网页保存到文件，库里存文件名）
                                 else
                                 {
-                                    string content = Fetch(newsurl);
+                                    string content = getWebContent.Fetch(newsurl);
                                     //MessageBox.Show(content);
                                     SQLServerUtil.addNews(newsid, newstitle, Utility.Encode(content), time, source, newsurl, "百度新闻",null);
                                     SQLServerUtil.updateReprint(newsid, source, time);
@@ -97,7 +96,7 @@ namespace szlibInfoThreads
                                     string tempstr = match6.Value.Substring(match6.Value.IndexOf('"') + 1);
                                     string reprintsUrl = base_url + tempstr.Substring(0, tempstr.IndexOf('"') + 1);
                                     //MessageBox.Show(reprintsUrl);
-                                    string reprintsHtml = Fetch(reprintsUrl);
+                                    string reprintsHtml = getWebContent.Fetch(reprintsUrl);
                                     List<string> reprintlist = getReprints(reprintsHtml);
                                     foreach (string reprint in reprintlist)
                                     {
@@ -128,84 +127,6 @@ namespace szlibInfoThreads
                     Console.WriteLine(e.Message);
                 }
             }            
-        }
-
-        //获取页面内容
-        public static String Fetch(string url)
-        {
-            string result = null;
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-            req.Timeout = 20000;
-            req.UserAgent = "szlibInfo";
-            req.Credentials = CredentialCache.DefaultCredentials;
-            HttpWebResponse res=null;
-            string contenttype = "text/html;   charset=utf-8";
-            //Encoding enc = Encoding.UTF8;
-            try
-            {
-                res = (HttpWebResponse)req.GetResponse();
-                contenttype = res.Headers["Content-Type"];
-                if (res != null)
-                {
-                    if (contenttype.Contains("gb2312") || contenttype.Contains("GB2312"))
-                    {
-                        StreamReader sr = new StreamReader(res.GetResponseStream(), Encoding.GetEncoding("GB2312"));
-                        result = sr.ReadToEnd();
-                        sr.Close();
-                    }
-                    else if (contenttype.Contains("gbk") || contenttype.Contains("GBK"))
-                    {
-                        StreamReader sr = new StreamReader(res.GetResponseStream(), Encoding.GetEncoding("GBK"));
-                        result = sr.ReadToEnd();
-                        sr.Close();
-                    }
-                    else if (contenttype.Contains("utf-8") || contenttype.Contains("UTF-8"))
-                    {
-                        StreamReader sr = new StreamReader(res.GetResponseStream(), Encoding.GetEncoding("UTF-8"));
-                        result = sr.ReadToEnd();
-                        sr.Close();
-                    }
-                    else
-                    {
-                        MemoryStream ms = new MemoryStream(ReadInstreamIntoMemory(res.GetResponseStream()));
-                        StreamReader sr = new StreamReader(ms, Encoding.GetEncoding("UTF-8"));
-                        result = sr.ReadToEnd();
-                        Match charSetMatch = Regex.Match(result, "charset=([a-zA-Z0-9\\-]+)", RegexOptions.IgnoreCase);
-                        string sChartSet = charSetMatch.Value.Substring(charSetMatch.Value.IndexOf('=') + 1);
-                        //MessageBox.Show(sChartSet);
-                        if (!string.IsNullOrEmpty(sChartSet) && !sChartSet.Equals("utf-8", StringComparison.OrdinalIgnoreCase))
-                        {
-                            ms.Seek(0, SeekOrigin.Begin);
-                            StreamReader sr1 = new StreamReader(ms, Encoding.GetEncoding(sChartSet));
-                            result = sr1.ReadToEnd();
-                            sr1.Close();     
-                        }
-                        sr.Close();
-                    }
-                    res.Close();
-                    
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                //MessageBox.Show(e.Message);
-            }            
-            return result;
-        }
-
-        private static byte[] ReadInstreamIntoMemory(Stream stream)
-        {
-            int bufferSize = 16384;
-            byte[] buffer = new byte[bufferSize];
-            MemoryStream ms = new MemoryStream();
-            while (true)
-            {
-                int numBytesRead = stream.Read(buffer, 0, bufferSize);
-                if (numBytesRead <= 0) break;
-                ms.Write(buffer, 0, numBytesRead);
-            }
-            return ms.ToArray();
         }
 
         //获取新闻列表

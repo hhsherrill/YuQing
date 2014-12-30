@@ -40,7 +40,7 @@ namespace szlibInfoThreads
                 try
                 {
                     //获取页面
-                    string webcontent = baiduThread.Fetch(m_url);
+                    string webcontent = getWebContent.Fetch(m_url);
                     //获取博客列表
                     List<string> blogList = getBlogs(webcontent);
                     foreach (string blog in blogList)
@@ -58,7 +58,7 @@ namespace szlibInfoThreads
                                 //如果库中已有该链接，表示已抓取过，后面的不用再抓取
                                 if (SQLServerUtil.existNewsId(blogid)) break;
                                 //没有就保存
-                                string contentHTML = baiduThread.Fetch(blogurl);
+                                string contentHTML = getWebContent.Fetch(blogurl);
                                 contentHTML = Regex.Replace(contentHTML, "\\s{3,}", "");
                                 contentHTML = contentHTML.Replace("\r", "");
                                 contentHTML = contentHTML.Replace("\n", "");
@@ -69,9 +69,9 @@ namespace szlibInfoThreads
                                 if(match1.Success)
                                 {
                                     string temp = match1.Groups["str"].Value;
-                                    temp = temp.Substring(0, temp.LastIndexOf('_')-1);
+                                    temp = temp.Substring(0, temp.LastIndexOf('_'));
                                     source = temp.Substring(temp.LastIndexOf('_') + 1);
-                                    title = temp.Substring(0, temp.LastIndexOf('_') - 1);
+                                    title = temp.Substring(0, temp.LastIndexOf('_'));
                                 }
                                 string time=null;
                                 string timepat = @"<span class=""time SG_txtc"">(?<time>[\s\S]+?)</span>";
@@ -95,7 +95,7 @@ namespace szlibInfoThreads
                                         {
                                             string imgurl = m.Groups["img"].Value;
                                             string imgname = imgurl.Substring(imgurl.LastIndexOf('/')+1);
-                                            saveImage.saveImageToFile(imgurl);
+                                            saveToFile.saveImageToFile(imgurl);
                                             SQLServerUtil.addImage(imgname,blogid);
                                         }
                                     }

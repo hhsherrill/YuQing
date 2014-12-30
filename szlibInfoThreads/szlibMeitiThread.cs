@@ -40,7 +40,7 @@ namespace szlibInfoThreads
                 try
                 {
                     //获取页面
-                    string webcontent = baiduThread.Fetch(m_url);
+                    string webcontent = getWebContent.Fetch(m_url);
                     //获取新闻列表
                     List<string> newslist = getNews(webcontent);
                     foreach (string news in newslist)
@@ -56,7 +56,7 @@ namespace szlibInfoThreads
                                 //没有就保存
                                 string newstitle = news.Substring(news.LastIndexOf('\'') + 2, news.IndexOf("</a>") - news.LastIndexOf('\'') - 2);
                                 string source = newstitle.Substring(newstitle.IndexOf('【') + 1, newstitle.IndexOf('】') - newstitle.IndexOf('【') - 1);
-                                string contentHTML = baiduThread.Fetch(newsurl);
+                                string contentHTML = getWebContent.Fetch(newsurl);
                                 string time = null;
                                 string timepat = @"<span id=""lblTime"">[^<>]+</span>";
                                 Match match = Regex.Match(contentHTML, timepat);

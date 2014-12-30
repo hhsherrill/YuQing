@@ -9,11 +9,11 @@ using System.Drawing;
 
 namespace szlibInfoUtil
 {
-    public class saveImage
+    public class saveToFile
     {
         private static string folder;
 
-        static saveImage()
+        static saveToFile()
         {
             folder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),"images");
         }

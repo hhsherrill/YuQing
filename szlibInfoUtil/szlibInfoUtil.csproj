@@ -67,8 +67,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="getWebContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="saveImage.cs" />
+    <Compile Include="saveToFile.cs" />
     <Compile Include="SQLServerUtil.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
