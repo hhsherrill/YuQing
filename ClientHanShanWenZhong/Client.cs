@@ -11,13 +11,15 @@ namespace ClientHanShanWenZhong
     public class Client
     {
         private Thread m_thread;
-        private static string tsg_url = string.Format("http://www.12345.suzhou.gov.cn/bbs/search.php?mod=forum&srchtxt={0}&orderby=dateline&ascdesc=desc&searchsubmit=yes", HttpUtility.UrlEncode("图书馆"));
-        private static string st_url = string.Format("http://www.12345.suzhou.gov.cn/bbs/search.php?mod=forum&srchtxt={0}&orderby=dateline&ascdesc=desc&searchsubmit=yes", HttpUtility.UrlEncode("苏图"));
-        private static string base_url = "http://www.12345.suzhou.gov.cn/bbs/";
+
+        HttpClient http = new HttpClient("http://www.12345.suzhou.gov.cn/bbs/");
+        object searchquery1 = new { srchtxt = "图书馆", mod = "forum", orderby = "dateline", ascdesc = "desc", searchsubmit = "yes" };
+        object searchquery2 = new { srchtxt = "苏图", mod = "forum", orderby = "dateline", ascdesc = "desc", searchsubmit = "yes" };
 
         public Client()
         {
-            m_thread = new Thread(Client.DoWork);
+            m_thread = new Thread(DoWork);
+            http.Request.PersistCookies = true;
         }
 
         public void Start()
@@ -30,7 +32,7 @@ namespace ClientHanShanWenZhong
             m_thread.Abort();
         }
 
-        public static void DoWork(object data)
+        public void DoWork(object data)
         {
             while (true)
             {
@@ -48,7 +50,7 @@ namespace ClientHanShanWenZhong
                             if (match.Success)
                             {
                                 string temp = match.Value.Substring(match.Value.IndexOf(">") + 1);
-                                topicurl = base_url + temp.Substring(temp.IndexOf('=') + 1).Trim('"', '\'', '#', ' ', '>').Replace("&amp;", "&");
+                                topicurl =temp.Substring(temp.IndexOf('=') + 1).Trim('"', '\'', '#', ' ', '>').Replace("&amp;", "&");
                             }
                             if (topicurl != null)
                             {
@@ -61,7 +63,7 @@ namespace ClientHanShanWenZhong
                                     else
                                     {
                                         //读取主题页面
-                                        string contentHTML = getWebContent.Fetch(topicurl);
+                                        string contentHTML = http.Get(topicurl).RawText;
                                         contentHTML = Regex.Replace(contentHTML, "\\s{3,}", "");
                                         contentHTML = contentHTML.Replace("\r", "");
                                         contentHTML = contentHTML.Replace("\n", "");
@@ -112,7 +114,7 @@ namespace ClientHanShanWenZhong
                                         time = Regex.Replace(time, "\\s{2,}", " ");
                                     }
                                     //读取主题页面
-                                    string contentHTML = getWebContent.Fetch(topicurl);
+                                    string contentHTML = http.Get(topicurl).RawText;
                                     contentHTML = Regex.Replace(contentHTML, "\\s{3,}", "");
                                     contentHTML = contentHTML.Replace("\r", "");
                                     contentHTML = contentHTML.Replace("\n", "");
@@ -172,25 +174,21 @@ namespace ClientHanShanWenZhong
         }
 
         //获取主题列表
-        private static List<string> getTopics()
+        private List<string> getTopics()
         {
             List<string> topiclist = new List<string>();
             String[] webcontent = new String[2];
-            var http = new HttpClient("http://www.12345.suzhou.gov.cn/bbs");
-            http.Request.PersistCookies = true;
-            var searchquery1 = new { srchtxt = "图书馆", mod = "forum", orderby = "dateline", ascdesc = "desc", searchsubmit = "yes" };
-            var response = http.Get("/search.php", searchquery1);
+            var response = http.Get("search.php", searchquery1);
             if (response.ContentLength < 1000)
             {
-                response = http.Get("/search.php", searchquery1);
+                response = http.Get("search.php", searchquery1);
             }
             webcontent[0] = HttpUtility.HtmlDecode(response.RawText);
 
-            var searchquery2= new { srchtxt = "苏图", mod = "forum", orderby = "dateline", ascdesc = "desc", searchsubmit = "yes" };
-            response = http.Get("/search.php", searchquery2);
+            response = http.Get("search.php", searchquery2);
             if (response.ContentLength < 1000)
             {
-                response = http.Get("/search.php", searchquery2);
+                response = http.Get("search.php", searchquery2);
             }
             webcontent[1] = HttpUtility.HtmlDecode(response.RawText);
 
