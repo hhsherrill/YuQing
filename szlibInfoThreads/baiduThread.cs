@@ -80,12 +80,18 @@ namespace szlibInfoThreads
                                 {
                                     SQLServerUtil.updateReprint(SQLServerUtil.existNewsTitle(newstitle), source, time);
                                 }
-                                //标题不存在，添加到库里（网页保存到文件，库里存文件名）
+                                //标题不存在，添加到库里
                                 else
                                 {
                                     string content = getWebContent.Fetch(newsurl);
+                                    content = Regex.Replace(content,@"<!--[\s\S]*?--!>","");
+                                    content = Regex.Replace(content, "\\s{3,}", "");
+                                    content = content.Replace("\r", "");
+                                    content = content.Replace("\n", "");
+                                    //string filename=saveToFile.saveWebToFile(newsurl);
+                                    //string content = "file://" + filename;
                                     //MessageBox.Show(content);
-                                    SQLServerUtil.addNews(newsid, newstitle, Utility.Encode(content), time, source, newsurl, "百度新闻",null);
+                                    SQLServerUtil.addNews(newsid, newstitle, Utility.Encode(content), time, source, newsurl, "百度新闻", null, DateTime.Now.ToString(), DateTime.Now.ToString());
                                     SQLServerUtil.updateReprint(newsid, source, time);
                                 }
                                 //是否有相同新闻转载

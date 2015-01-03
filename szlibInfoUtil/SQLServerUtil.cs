@@ -99,13 +99,13 @@ namespace szlibInfoUtil
         }
 
         //添加主题
-        public static void addNews(string newsid, string newstitle, string content, string time, string source,string url,string category,string status)
+        public static void addNews(string newsid, string newstitle, string content, string time, string source,string url,string category,string status,string createtime,string updatetime)
         {
             try
             {
                 SqlConnection conn = new SqlConnection(strconn);
                 conn.Open();
-                string s = "insert into newsInfo (infoID,title,context,time,source,url,category,status) values('" + newsid + "','" + newstitle + "','" + content + "','" + time + "','" + source + "','"+url+"','"+category+"','"+status+"')";
+                string s = "insert into newsInfo (infoID,title,context,time,source,url,category,status,createtime,updatetime) values('" + newsid + "','" + newstitle + "','" + content + "','" + time + "','" + source + "','"+url+"','"+category+"','"+status+"','"+createtime+"','"+updatetime+"')";
                 SqlCommand cmd = new SqlCommand(s, conn);
                 cmd.ExecuteNonQuery();
                 conn.Close();
@@ -139,13 +139,13 @@ namespace szlibInfoUtil
         }
 
         //寒山闻钟更新状态
-        public static void updateStatus(string topicid, string status)
+        public static void updateStatus(string topicid, string status,string updatetime)
         {
             try
             {
                 SqlConnection conn = new SqlConnection(strconn);
                 conn.Open();
-                string s="update newsInfo set status='"+status+"' where infoID='"+topicid+"'";
+                string s="update newsInfo set status='"+status+"',updatetime='"+updatetime+"' where infoID='"+topicid+"'";
                 SqlCommand cmd = new SqlCommand(s, conn);
                 cmd.ExecuteNonQuery();
                 conn.Close();
@@ -179,17 +179,42 @@ namespace szlibInfoUtil
         {
             try
             {
-                SqlConnection conn = new SqlConnection(strconn);
-                conn.Open();
-                string s = "insert into newsPicture (name,infoID) values('" + imgname + "','" + infoid + "')";
-                SqlCommand cmd = new SqlCommand(s, conn);
-                cmd.ExecuteNonQuery();
-                conn.Close();
+                if (!existPicture(imgname, infoid))
+                {
+                    SqlConnection conn = new SqlConnection(strconn);
+                    conn.Open();
+                    string s = "insert into newsPicture (name,infoID) values('" + imgname + "','" + infoid + "')";
+                    SqlCommand cmd = new SqlCommand(s, conn);
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
+                }              
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
         }
+
+        //查找图片
+        public static Boolean existPicture(string imgname, string infoid)
+        {
+            Boolean result = false;
+            try
+            {
+                SqlConnection conn = new SqlConnection(strconn);
+                conn.Open();
+                string s = "select * from newsPicture where infoID='" + infoid + "' and name='"+imgname+"'";
+                SqlCommand cmd = new SqlCommand(s, conn);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read()) result = true;
+                dr.Close();
+                conn.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return result;
+        } 
     }
 }

@@ -75,7 +75,7 @@ namespace szlibInfoThreads
                                         if (match1.Success) status = match1.Value.Substring(match1.Value.Length - 3);
                                         if (status != oldStatus)
                                         {
-                                            SQLServerUtil.updateStatus(topicid, status);
+                                            SQLServerUtil.updateStatus(topicid, status, DateTime.Now.ToString());
                                         }
                                         //已处理，保存处理结果
                                         if (status == "已处理")
@@ -132,7 +132,7 @@ namespace szlibInfoThreads
                                     string statusPat = @"本主题由[ ]*\S+[ ]*于[ ]*[\s\S]+[ ]*添加图标[ ]*已\S{2}";
                                     Match match4 = Regex.Match(contentHTML, statusPat);
                                     if (match4.Success) status = match4.Value.Substring(match4.Value.Length - 3);
-                                    SQLServerUtil.addNews(topicid, topictitle, content, time, null, topicurl, "寒山闻钟", status);
+                                    SQLServerUtil.addNews(topicid, topictitle, content, time, null, topicurl, "寒山闻钟", status, DateTime.Now.ToString(), DateTime.Now.ToString());
                                     //如果已处理，保存处理结果
                                     if (status == "已处理")
                                     {

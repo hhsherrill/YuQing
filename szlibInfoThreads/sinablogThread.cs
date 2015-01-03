@@ -103,7 +103,7 @@ namespace szlibInfoThreads
                                     content = Regex.Replace(content, @"</p>|</P>", "\n");
                                     content = Regex.Replace(content, @"<[^<>]+?>", "");
                                 }
-                                SQLServerUtil.addNews(blogid, title, Utility.Encode(content), time, source, blogurl, "新浪博客", null);
+                                SQLServerUtil.addNews(blogid, title, Utility.Encode(content), time, source, blogurl, "新浪博客", null, DateTime.Now.ToString(), DateTime.Now.ToString());
                             }
                         }
                         catch (Exception e)

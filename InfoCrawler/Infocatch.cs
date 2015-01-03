@@ -16,6 +16,7 @@ namespace InfoCrawler
         private szlibMeitiThread m_szlibMeitiThread;
         //private hswzThread m_hswzThread;
         private sinablogThread m_sinablogThread;
+        private ClientHanShanWenZhong.Client m_hswzThread;
 
         public Infocatch()
         {
@@ -33,6 +34,9 @@ namespace InfoCrawler
 
             m_sinablogThread = new sinablogThread();
             m_sinablogThread.Start();
+
+            m_hswzThread = new ClientHanShanWenZhong.Client();
+            m_hswzThread.Start();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -47,6 +51,7 @@ namespace InfoCrawler
             m_szlibMeitiThread.Abort();
             //m_hswzThread.Abort();
             m_sinablogThread.Abort();
+            m_hswzThread.Abort();
         }
     }
 }

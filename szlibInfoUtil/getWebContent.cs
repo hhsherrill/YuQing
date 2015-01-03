@@ -75,7 +75,7 @@ namespace szlibInfoUtil
             return result;
         }
 
-        private static byte[] ReadInstreamIntoMemory(Stream stream)
+        public static byte[] ReadInstreamIntoMemory(Stream stream)
         {
             int bufferSize = 16384;
             byte[] buffer = new byte[bufferSize];
