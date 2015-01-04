@@ -5,7 +5,7 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
-            var client = new ClientHanShanWenZhong.Client();
+            var client = new ClientZhongGuoSuZhou.Client();
             client.Start();
         
         }
