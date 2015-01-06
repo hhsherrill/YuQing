@@ -94,7 +94,7 @@ namespace szlibInfoThreads
                                         foreach (Match m in mc)
                                         {
                                             string imgurl = m.Groups["img"].Value;
-                                            string imgname = imgurl.Substring(imgurl.LastIndexOf('/')+1);
+                                            string imgname = Utility.Hash(imgurl) + ".jpg";
                                             saveToFile.saveImageToFile(imgurl);
                                             SQLServerUtil.addImage(imgname,blogid);
                                         }

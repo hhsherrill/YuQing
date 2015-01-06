@@ -14,9 +14,9 @@ namespace InfoCrawler
     {
         private baiduThread m_baiduThread;
         private szlibMeitiThread m_szlibMeitiThread;
-        //private hswzThread m_hswzThread;
         private sinablogThread m_sinablogThread;
         private ClientHanShanWenZhong.Client m_hswzThread;
+        private ClientZhongGuoSuZhou.Client m_zgszThread;
 
         public Infocatch()
         {
@@ -29,14 +29,14 @@ namespace InfoCrawler
             m_szlibMeitiThread = new szlibMeitiThread();
             m_szlibMeitiThread.Start();
 
-            //m_hswzThread =new hswzThread();
-            //m_hswzThread.Start();
-
             m_sinablogThread = new sinablogThread();
             m_sinablogThread.Start();
 
             m_hswzThread = new ClientHanShanWenZhong.Client();
             m_hswzThread.Start();
+
+            m_zgszThread = new ClientZhongGuoSuZhou.Client();
+            m_zgszThread.Start();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -49,9 +49,9 @@ namespace InfoCrawler
         {
             m_baiduThread.Abort();
             m_szlibMeitiThread.Abort();
-            //m_hswzThread.Abort();
             m_sinablogThread.Abort();
             m_hswzThread.Abort();
+            m_zgszThread.Abort();
         }
     }
 }

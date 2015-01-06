@@ -120,7 +120,7 @@ namespace ClientHanShanWenZhong
                                     Match match4 = Regex.Match(contentHTML, statusPat);
                                     if (match4.Success) status = match4.Value.Substring(match4.Value.Length - 3);
                                     //MessageBox.Show(topicid + "\n" + topictitle + "\n" + time + "\n" + base_url + topicurl);
-                                    SQLServerUtil.addNews(topicid, topictitle, content, time, source, base_url+topicurl, "寒山闻钟", status, DateTime.Now.ToString(), DateTime.Now.ToString());
+                                    SQLServerUtil.addNews(topicid, topictitle, Utility.Encode(content), time, source, base_url + topicurl, "寒山闻钟", status, DateTime.Now.ToString(), DateTime.Now.ToString());
                                     //如果已处理，保存处理结果
                                     if (status == "已处理")
                                     {                                       

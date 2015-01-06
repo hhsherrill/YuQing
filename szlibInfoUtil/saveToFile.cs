@@ -23,7 +23,8 @@ namespace szlibInfoUtil
         public static void saveImageToFile(string imageurl)
         {
             if (!Directory.Exists(imagefolder)) Directory.CreateDirectory(imagefolder);
-            string filename = imageurl.Substring(imageurl.LastIndexOf('/') + 1);
+            //string filename = imageurl.Substring(imageurl.LastIndexOf('/') + 1);
+            string filename = Utility.Hash(imageurl) + ".jpg";
             if (!File.Exists(Path.Combine(imagefolder, filename)))
             {
                 WebRequest req = WebRequest.Create(imageurl);

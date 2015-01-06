@@ -106,6 +106,10 @@
       <Project>{fd8c1269-8ab0-4c1e-b0dd-739f2d5712e0}</Project>
       <Name>ClientHanShanWenZhong</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ClientZhongGuoSuZhou\ClientZhongGuoSuZhou.csproj">
+      <Project>{0ba492c8-d472-44d1-a141-159cab0b5cdb}</Project>
+      <Name>ClientZhongGuoSuZhou</Name>
+    </ProjectReference>
     <ProjectReference Include="..\szlibInfoThreads\szlibInfoThreads.csproj">
       <Project>{11a096ec-e085-4d53-8bf9-adecc4324329}</Project>
       <Name>szlibInfoThreads</Name>
