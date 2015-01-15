@@ -70,6 +70,7 @@ namespace szlibInfoThreads
                                 Match match2 = Regex.Match(contentHTML, contentpat);
                                 if (match2.Success) content = match2.Value.Replace("<br>", "\n");
                                 content = content.Substring(content.IndexOf('>') + 1, content.LastIndexOf('<') - content.IndexOf('>') - 1);
+                                content = Regex.Replace(content, @"<[^<>]+?>", "");
                                 SQLServerUtil.addNews(newsid, newstitle, Utility.Encode(content), time, source, newsurl, "本馆网站", null, DateTime.Now.ToString(), DateTime.Now.ToString());
                             }
                         }

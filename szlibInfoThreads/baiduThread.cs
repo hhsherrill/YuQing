@@ -83,6 +83,12 @@ namespace szlibInfoThreads
                                 //标题不存在，添加到库里
                                 else
                                 {
+                                    //用百度快照来读
+                                    //string cacheurlPat = @"<a href=""(?<cacheurl>[^""'<>#]+?)""[^<>]+?>百度快照</a>";
+                                    //Match cacheurlMatch = Regex.Match(newsitem,cacheurlPat);
+                                    //string cacheurl=newsurl;
+                                    //if (cacheurlMatch.Success) cacheurl = cacheurlMatch.Groups["cacheurl"].Value;
+                                    //MessageBox.Show(cacheurl);
                                     string content = getWebContent.Fetch(newsurl);
                                     content = Regex.Replace(content,@"<!--[\s\S]*?--!>","");
                                     content = Regex.Replace(content, "\\s{3,}", "");

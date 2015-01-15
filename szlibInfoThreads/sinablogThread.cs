@@ -86,7 +86,7 @@ namespace szlibInfoThreads
                                 Match match3 = Regex.Match(contentHTML, contentPat);
                                 if (match3.Success)
                                 {
-                                    content = match3.Groups["content"].Value;
+                                    content = match3.Groups["content"].Value;                                    
                                     string imgPat = @"<img[\s\S]*?real_src[ ]*=[""'](?<img>[^""'>#]+?)[""'][\s\S]*?/>";
                                     MatchCollection mc = Regex.Matches(content, imgPat);
                                     if (mc != null && mc.Count > 0)
@@ -96,12 +96,15 @@ namespace szlibInfoThreads
                                             string imgurl = m.Groups["img"].Value;
                                             string imgname = Utility.Hash(imgurl) + ".jpg";
                                             saveToFile.saveImageToFile(imgurl);
-                                            SQLServerUtil.addImage(imgname,blogid);
+                                            //SQLServerUtil.addImage(imgname,blogid);
+                                            content=content.Replace(imgurl,@"images\"+imgname);
                                         }
                                     }
-                                    content = Regex.Replace(content,@"<br>|<br */>","\n");
-                                    content = Regex.Replace(content, @"</p>|</P>", "\n");
-                                    content = Regex.Replace(content, @"<[^<>]+?>", "");
+                                    content = Regex.Replace(content, @"\bsrc=""[^<>'""]+""", "");
+                                    content = Regex.Replace(content, @"\breal_src\s*=", "src=");
+                                    //content = Regex.Replace(content,@"<br>|<br */>","\n");
+                                    //content = Regex.Replace(content, @"</p>|</P>", "\n");
+                                    //content = Regex.Replace(content, @"<[^<>]+?>", "");
                                 }
                                 SQLServerUtil.addNews(blogid, title, Utility.Encode(content), time, source, blogurl, "新浪博客", null, DateTime.Now.ToString(), DateTime.Now.ToString());
                             }
