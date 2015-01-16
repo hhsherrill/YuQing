@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using szlibInfoUtil;
 
@@ -22,8 +22,9 @@ namespace ClientHuiKe
         {
             m_thread = new Thread(DoWork);
             http.TimeOut = 20000;
-            http.AcceptEncoding = "GBK";
+            http.AcceptLanguage = "zh-Hans-CN,zh-Hans;q=0.5";
             http.Accept = "text/html, application/xhtml+xml, */*";
+            http.Encoding = System.Text.Encoding.GetEncoding("GBK"); 
             http.AutoRedirect = true;
         }
 
@@ -99,7 +100,7 @@ namespace ClientHuiKe
             
             http.GetHtml("http://wisenews.wisers.net/?gid=SZLIBCN&user=ipaccess");
             http.GetHtml("http://wisesearch.wisers.net/");
-            string postData1 = string.Format("defaultTemplate=&searchQueryFormUpdated=true&type=&template-name=&curr-template-name=&content-locale=zh_CN&search-action=&sort-order-list=DESC%3Adate&from-date={1}{2}{3}&to-date={1}{2}{3}&date-range=PUB%3A{1}.{2}.{3}-{1}.{2}.{3}&included-publication-uids=&excluded-publication-uids=&included-listedcompany-uids=&excluded-listedcompany-uids=&included-adind-uids=&excluded-adind-uids=&included-adbrand-uids=&excluded-adbrand-uids=&hot-picks=&search_doc_type=news-only&search-query-string={0}&use-thesaurus=true&by-scope=headline%2Bcontent&within-scope=document&date-range-from-year={1}&date-range-from-month={2}&date-range-from-day={3}&date-range-to-year={1}&date-range-to-month={2}&date-range-to-day={3}&date-range-period=today&search_region=&search_source=&search_type=&select_pub_name=&delete_pub_name=&search_source_input=%C7%EB%CA%E4%C8%EB%C3%BD%CC%E5%C3%FB%D7%D6%A3%AC%C0%FD%C8%E7%A3%BA%C4%CF%B7%BD%B6%BC%CA%D0%B1%A8&template-name-new-radio=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+2&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+3&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+4&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+5&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+6&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+7&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+8&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+9&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+10&language=all&author_name=&column_name=&section_name=&listedcompany-include-op=or", HttpUtility.UrlEncode("212", Encoding.GetEncoding("gbk")),year,month,day);
+            string postData1 = string.Format("defaultTemplate=&searchQueryFormUpdated=true&type=&template-name=&curr-template-name=&content-locale=zh_CN&search-action=&sort-order-list=DESC%3Adate&from-date={1}{2}{3}&to-date={1}{2}{3}&date-range=PUB%3A{1}.{2}.{3}-{1}.{2}.{3}&included-publication-uids=&excluded-publication-uids=&included-listedcompany-uids=&excluded-listedcompany-uids=&included-adind-uids=&excluded-adind-uids=&included-adbrand-uids=&excluded-adbrand-uids=&hot-picks=&search_doc_type=news-only&search-query-string={0}&use-thesaurus=true&by-scope=headline%2Bcontent&within-scope=document&date-range-from-year={1}&date-range-from-month={2}&date-range-from-day={3}&date-range-to-year={1}&date-range-to-month={2}&date-range-to-day={3}&date-range-period=today&search_region=&search_source=&search_type=&select_pub_name=&delete_pub_name=&search_source_input=%C7%EB%CA%E4%C8%EB%C3%BD%CC%E5%C3%FB%D7%D6%A3%AC%C0%FD%C8%E7%A3%BA%C4%CF%B7%BD%B6%BC%CA%D0%B1%A8&template-name-new-radio=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+2&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+3&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+4&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+5&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+6&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+7&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+8&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+9&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+10&language=all&author_name=&column_name=&section_name=&listedcompany-include-op=or", HttpUtility.UrlEncode("苏州图书馆", Encoding.GetEncoding("gbk")),year,month,day);
             http.Post("http://cn.wisesearch.wisers.net/cnws/search.do", postData1);
             webcontent = http.GetHtml("http://cn.wisesearch.wisers.net/cnws/FULL-CONTENT-DOCUMENT-BODY.do?is_expo=&adhoc-clip-folder-id=search-result&narrow-publication-scope=default");
             
