@@ -17,6 +17,7 @@ namespace InfoCrawler
         private sinablogThread m_sinablogThread;
         private ClientHanShanWenZhong.Client m_hswzThread;
         private ClientZhongGuoSuZhou.Client m_zgszThread;
+        private ClientHuiKe.Client m_huikeThread;
 
         public Infocatch()
         {
@@ -37,6 +38,9 @@ namespace InfoCrawler
 
             m_zgszThread = new ClientZhongGuoSuZhou.Client();
             m_zgszThread.Start();
+
+            m_huikeThread = new ClientHuiKe.Client();
+            m_huikeThread.Start();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -52,6 +56,7 @@ namespace InfoCrawler
             m_sinablogThread.Abort();
             m_hswzThread.Abort();
             m_zgszThread.Abort();
+            m_huikeThread.Abort();
         }
     }
 }
