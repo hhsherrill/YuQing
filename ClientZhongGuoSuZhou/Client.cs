@@ -89,14 +89,15 @@ namespace ClientZhongGuoSuZhou
                                             foreach (Match m in mc)
                                             {
                                                 string imgurl = topicurl.Substring(0, topicurl.LastIndexOf('/')) + m.Groups["img"].Value.Substring(1);
-                                                string imgname = Utility.Hash(imgurl) + ".jpg";
+                                                content = content.Replace(m.Groups["img"].Value,imgurl);
+                                                /*string imgname = Utility.Hash(imgurl) + ".jpg";
                                                 saveToFile.saveImageToFile(imgurl);
-                                                SQLServerUtil.addImage(imgname, topicurl);
+                                                SQLServerUtil.addImage(imgname, topicurl);*/
                                             }
                                         }
-                                        content = Regex.Replace(content, @"<[br|BR][\s\S]*?>", "\n");
+                                        /*content = Regex.Replace(content, @"<[br|BR][\s\S]*?>", "\n");
                                         content = Regex.Replace(content, @"</p>|</P>", "\n");
-                                        content = Regex.Replace(content, @"<[^<>]+?>", "");
+                                        content = Regex.Replace(content, @"<[^<>]+?>", "");*/
                                     }
                                     //另一种格式
                                     else
@@ -112,13 +113,14 @@ namespace ClientZhongGuoSuZhou
                                                 foreach (Match m in mc)
                                                 {
                                                     string imgurl = topicurl.Substring(0, topicurl.LastIndexOf('/')) + m.Groups["img"].Value.Substring(1);
-                                                    string imgname = Utility.Hash(imgurl) + ".jpg";
+                                                    content = content.Replace(m.Groups["img"].Value,imgurl);
+                                                    /*string imgname = Utility.Hash(imgurl) + ".jpg";
                                                     saveToFile.saveImageToFile(imgurl);
-                                                    SQLServerUtil.addImage(imgname, topicurl);
+                                                    SQLServerUtil.addImage(imgname, topicurl);*/
                                                 }
                                             }
-                                            content = Regex.Replace(content, @"</div>|</DIV>", "\n");
-                                            content = Regex.Replace(content, @"<[^<>]+?>", "");
+                                            /*content = Regex.Replace(content, @"</div>|</DIV>", "\n");
+                                            content = Regex.Replace(content, @"<[^<>]+?>", "");*/
                                         }
                                     }
                                     //MessageBox.Show(source);
