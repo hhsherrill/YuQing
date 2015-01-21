@@ -53,8 +53,8 @@ namespace ClientZhongGuoSuZhou
                             if (topicurl != null)
                             {
                                 string topicid = Utility.Hash(topicurl);
-                                //如果库中已有该链接，表示已抓取过，后面的不用再抓取
-                                if (SQLServerUtil.existNewsId(topicid)) break;
+                                //如果库中已有该链接，表示已抓取过，跳过
+                                if (SQLServerUtil.existNewsId(topicid)) continue;
                                 string topictitle = topic.Substring(topic.IndexOf('>') + 1, topic.IndexOf("</a>") - topic.IndexOf('>') - 1);
                                 //搜索结果存在相同文章，只保存一次
                                 if (topictitle != null && SQLServerUtil.existNewsTitle(topictitle) != null) continue;

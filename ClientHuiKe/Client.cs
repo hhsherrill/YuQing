@@ -54,16 +54,35 @@ namespace ClientHuiKe
                         Match urlmatch=Regex.Match(topic,urlpat);
                         if (urlmatch.Success)
                         {
-                            topicurl = "http://cn.wisesearch.wisers.net/cnws" + urlmatch.Groups["url"].Value;
+                            topicurl = "http://cn.wisesearch.wisers.net/cnws" + Regex.Replace(urlmatch.Groups["url"].Value, @"\(S:\d+?\)", "");
+                            //MessageBox.Show(topicurl);
                             string topicid = Utility.Hash(topicurl);
                             //如果库中已有该链接，表示已抓取过，后面的不用再抓取
                             if (SQLServerUtil.existNewsId(topicid)) break;
                             //没有就保存
-                            string title = null;
+                            string title = null;  //标题
                             string titlepat = @"document.write\(""(?<title>[^<>'""]+?)""";
                             Match titlematch = Regex.Match(topic, titlepat);
                             if(titlematch.Success) title=titlematch.Groups["title"].Value.Replace("&amp;","&");
-                            MessageBox.Show(title);
+                            //MessageBox.Show(title);
+                            string time = null;  //日期
+                            string timepat = @"<td class=""greytext"">(?<time>\d{4}-\d{2}-\d{2})</td>";
+                            Match timematch = Regex.Match(topic, timepat);
+                            if (timematch.Success) time = timematch.Groups["time"].Value;
+                            string source = null;  //来源
+                            string sourcepat = @"<a href=""javascript://NWPM"" class=""newsresultlink"" onClick='OpenSearchByPubWin\([\s\S]+?\);'>(?<source>[\s\S]+?)</a>";
+                            Match sourcematch = Regex.Match(topic, sourcepat);
+                            if (sourcematch.Success) source = sourcematch.Groups["source"].Value.Replace("&nbsp;","");
+                            string content = null;  //内容
+                            string contentHTML = http.GetHtml(topicurl);
+                            contentHTML = Regex.Replace(contentHTML, "\\s{3,}", "");
+                            contentHTML = contentHTML.Replace("\r", "");
+                            contentHTML = contentHTML.Replace("\n", "");
+                            string contentpat = @"<td colspan=""3"" class=""content"" style=""padding:6px 22px"">(?<content>[\s\S]+?)</td>";
+                            Match contentmatch = Regex.Match(contentHTML, contentpat);
+                            if (contentmatch.Success) content = contentmatch.Groups["content"].Value;
+                            //MessageBox.Show(content);
+                            SQLServerUtil.addNews(topicid, title, Utility.Encode(content), time, source, topicurl, "慧科搜索", null, DateTime.Now.ToString(), DateTime.Now.ToString());
                         }
                     }
                     catch (Exception e)
@@ -108,7 +127,6 @@ namespace ClientHuiKe
             webcontent = webcontent.Replace("\r", "");
             webcontent = webcontent.Replace("\n", "");
             //MessageBox.Show(webcontent);
-            Console.Write(webcontent);
             string pat = @"<tr valign='top' onMouseOut=""mouseout\(this\);"" *>(?<topic>[\s\S]+?)</tr>";
             MatchCollection mc = Regex.Matches(webcontent, pat);
             foreach (Match m in mc)

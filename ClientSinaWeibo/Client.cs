@@ -10,6 +10,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
+using System.Windows.Forms;
+using szlibInfoUtil;
 
 namespace ClientSinaWeibo
 {
@@ -47,11 +49,62 @@ namespace ClientSinaWeibo
                 {
                     //获取信息列表
                     List<string> topiclist = getTopics();
-                    foreach (string topic in topiclist)
+                    for(int i=0;i<topiclist.Count;i++)
+                    //foreach (string topic in topiclist)
                     {
                         try
                         {
+                            string topic = topiclist[i];
+                            string topicid = null;  //微博id
+                            string topicidPat = @"<div mid=""(?<topicid>\d+?)""";
+                            Match topicidMatch = Regex.Match(topic,topicidPat);
+                            if (topicidMatch.Success) topicid = topicidMatch.Groups["topicid"].Value;
+                            //如果库中已有该条微博，表示已抓取过，后面的不用再抓取
+                            if (SQLServerUtil.existNewsId(topicid)) break;
+                            //没有就保存
+                            if (topicid != null)
+                            {
+                                string source = null;  //作者
+                                string sourcePat = @"nick-name=""(?<source>\S+?)""";
+                                Match sourceMatch = Regex.Match(topic, sourcePat);
+                                if (sourceMatch.Success) source = sourceMatch.Groups["source"].Value;
+                                string time = null;  //时间
+                                string timePat = @"title=""(?<time>\d{4}-\d{2}-\d{2} \d{2}:\d{2})""";
+                                Match timeMatch = Regex.Match(topic, timePat);
+                                if (timeMatch.Success) time = timeMatch.Groups["time"].Value;
 
+                                string content = Regex.Replace(topic,@"<div class=""WB_screen W_fr"">[\s\S]+?</div></div></div>","");
+                                content = Regex.Replace(content, @"<a[^<>]*?href=['""][^'""<>]+?['""][^<>]*?>", "");
+                                content = content.Replace("</a>","");
+                                SQLServerUtil.addNews(topicid, null, Utility.Encode(content), time, source, null, "新浪微博", null, DateTime.Now.ToString(), DateTime.Now.ToString());
+                            }
+                            //topic为下一页
+                            else
+                            {
+                                string nextpage = null;
+                                string nextpagePat = @"<a href=""(?<nextpage>[^<>'""#]+?)""[^<>]+?>下一页</a>";
+                                Match match = Regex.Match(topic, nextpagePat);
+                                if (match.Success)
+                                {
+                                    nextpage = "http://s.weibo.com" + match.Groups["nextpage"].Value;
+                                    string html = http.GetHtml(nextpage);
+                                    html = Utility.ascii2Native(html);
+                                    html = Regex.Replace(html, "\\s{3,}", "");
+                                    html = html.Replace("\r", "").Replace("\n", "").Replace("\\n", "").Replace("\\t", "").Replace("\\\"", "\"").Replace("\\/", "/").Replace("&amp;", "&");
+
+                                    string pat = @"<div class=""WB_cardwrap S_bg2 clearfix"">(?<topic>[\s\S]+?<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div></div>)</div>";
+                                    MatchCollection mc = Regex.Matches(html, pat);
+                                    foreach (Match m in mc)
+                                    {
+                                        topiclist.Add(m.Groups["topic"].Value);
+                                    }
+
+                                    //下一页
+                                    string nextpagePat2 = @"<a href=""[^<>'""#]+?""[^<>]+?>下一页</a>";
+                                    Match match2 = Regex.Match(html, nextpagePat2);
+                                    if (match2.Success) topiclist.Add(match2.Value);
+                                }
+                            }                            
                         }
                         catch (Exception e)
                         {
@@ -75,12 +128,10 @@ namespace ClientSinaWeibo
         //获取主题列表
         private List<string> getTopics()
         {
-
             byte[] bytes = Encoding.Default.GetBytes(System.Web.HttpUtility.UrlEncode("szlibqb@163.com"));
             string user = Convert.ToBase64String(bytes);
             //string pwd = GetPwd("65115373", "1421374332", "EIO7RP", "1330428213");
             List<string> topiclist = new List<string>();
-            String[] webcontent = new String[2];
             var html = http.GetHtml(string.Format("http://login.sina.com.cn/sso/prelogin.php?entry=weibo&callback=sinaSSOController.preloginCallBack&su={0}&rsakt=mod&checkpin=1&client=ssologin.js(v1.4.18)&_={1}", user, ConvertDateTimeInt(DateTime.Now)));
             string servertime = Regex.Match(html, ",\"servertime\":(.*?),", RegexOptions.IgnoreCase).Groups[1].Value;
             string nonce=Regex.Match(html, ",\"nonce\":\"(.*?)\",", RegexOptions.IgnoreCase).Groups[1].Value;
@@ -110,10 +161,24 @@ namespace ClientSinaWeibo
 
             html = http.GetHtml(string.Format("http://s.weibo.com/wb/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
                 ,HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")),year2,month2,day2,year1,month1,day1));
-            foreach (string content in webcontent)
-            {
+            //html = http.GetHtml(string.Format("http://s.weibo.com/wb/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
+            //    , HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")), "2015", "01", "15", "2015", "01", "16"));
+            html = Utility.ascii2Native(html);
+            html = Regex.Replace(html, "\\s{3,}", "");
+            html = html.Replace("\r", "").Replace("\n", "").Replace("\\n", "").Replace("\\t", "").Replace("\\\"", "\"").Replace("\\/", "/").Replace("&amp;","&");
 
+            string pat = @"<div class=""WB_cardwrap S_bg2 clearfix"">(?<topic>[\s\S]+?<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div></div>)</div>";
+            MatchCollection mc = Regex.Matches(html, pat);
+            foreach (Match m in mc)
+            {
+                topiclist.Add(m.Groups["topic"].Value);
             }
+
+            //下一页
+            string nextpagePat = @"<a href=""[^<>'""#]+?""[^<>]+?>下一页</a>";
+            Match match = Regex.Match(html, nextpagePat);
+            if (match.Success) topiclist.Add(match.Value);
+
             return topiclist;
         }
 

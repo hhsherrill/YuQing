@@ -42,6 +42,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -109,6 +110,10 @@
     <ProjectReference Include="..\ClientHuiKe\ClientHuiKe.csproj">
       <Project>{36ccacda-723d-4478-bb4a-e106f76cece5}</Project>
       <Name>ClientHuiKe</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClientSinaWeibo\ClientSinaWeibo.csproj">
+      <Project>{b1873577-113a-4631-ac76-6cdf67806706}</Project>
+      <Name>ClientSinaWeibo</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClientZhongGuoSuZhou\ClientZhongGuoSuZhou.csproj">
       <Project>{0ba492c8-d472-44d1-a141-159cab0b5cdb}</Project>

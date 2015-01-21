@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Windows.Forms;
+using System.Globalization;
 
 namespace szlibInfoUtil
 {
     public class Utility
     {
+        private static string PREFIX = @"\u";
+
         public static string Hash(string url)
         {
             MD5CryptoServiceProvider x = new MD5CryptoServiceProvider();
@@ -122,6 +126,40 @@ namespace szlibInfoUtil
             str = str.Replace("“", "&ldquo;");
             str = str.Replace("”", "&rdquo;");
             return str;
-        } 
+        }
+
+        public static String ascii2Native(string str)
+        {
+            
+            StringBuilder sb = new StringBuilder();
+            int begin = 0;
+            int index = str.IndexOf(PREFIX);
+            while (index != -1)
+            {
+                sb.Append(str.Substring(begin, index-begin));
+                sb.Append(ascii2Char(str.Substring(index, 6)));
+                begin = index + 6;
+                index = str.IndexOf(PREFIX, begin);
+            }
+            sb.Append(str.Substring(begin));
+            return sb.ToString();
+        }
+
+        private static char ascii2Char(string str)
+        {
+            if (str.Length != 6)
+            {
+                throw new Exception("Ascii string of a native character must be 6 character.");
+            }
+            if (!PREFIX.Equals(str.Substring(0, 2)))
+            {
+                throw new Exception("Ascii string of a native character must start with \"\\u\".");
+            }
+            string tmp = str.Substring(2, 2);
+            int code = int.Parse(tmp,NumberStyles.AllowHexSpecifier)<<8;
+            tmp = str.Substring(4, 2);
+            code += int.Parse(tmp, NumberStyles.AllowHexSpecifier);
+            return (char)code;
+        }
     }
 }
