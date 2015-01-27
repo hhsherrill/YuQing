@@ -115,6 +115,10 @@
       <Project>{b1873577-113a-4631-ac76-6cdf67806706}</Project>
       <Name>ClientSinaWeibo</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ClientTengXunWeibo\ClientTengXunWeibo.csproj">
+      <Project>{e49aa1f1-556d-4430-8ef0-068ce7196684}</Project>
+      <Name>ClientTengXunWeibo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClientZhongGuoSuZhou\ClientZhongGuoSuZhou.csproj">
       <Project>{0ba492c8-d472-44d1-a141-159cab0b5cdb}</Project>
       <Name>ClientZhongGuoSuZhou</Name>

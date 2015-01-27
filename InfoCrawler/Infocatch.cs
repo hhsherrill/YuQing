@@ -19,6 +19,7 @@ namespace InfoCrawler
         private ClientZhongGuoSuZhou.Client m_zgszThread;
         private ClientHuiKe.Client m_huikeThread;
         private ClientSinaWeibo.Client m_sinaweiboThread;
+        private ClientTengXunWeibo.Client m_txweiboThread;
 
         public Infocatch()
         {
@@ -45,11 +46,14 @@ namespace InfoCrawler
 
             m_sinaweiboThread = new ClientSinaWeibo.Client();
             m_sinaweiboThread.Start();
+
+            m_txweiboThread = new ClientTengXunWeibo.Client();
+            m_txweiboThread.Start();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            //this.Visible = false;
+            this.Visible = false;
             timer1.Enabled = false;
         }
 
@@ -62,6 +66,7 @@ namespace InfoCrawler
             m_zgszThread.Abort();
             m_huikeThread.Abort();
             m_sinaweiboThread.Abort();
+            m_txweiboThread.Abort();
         }
     }
 }
