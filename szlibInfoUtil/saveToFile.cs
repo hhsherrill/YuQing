@@ -17,7 +17,7 @@ namespace szlibInfoUtil
         static saveToFile()
         {
             //imagefolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),"images");
-            imagefolder = Path.Combine("E:\\WAP\\InfoSearch", "images");
+            imagefolder = Path.Combine("D:\\hh\\InfoSearch", "images");  //服务器上InfoSearch网站路径
             webfolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "webs");
         }
 
