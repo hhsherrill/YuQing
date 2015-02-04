@@ -102,6 +102,7 @@ namespace szlibInfoThreads
                                     }
                                     content = Regex.Replace(content, @"\bsrc=""[^<>'""]+""", "");
                                     content = Regex.Replace(content, @"\breal_src\s*=", "src=");
+                                    content = content.Replace("苏州图书馆", "<B style=\"color:red\">苏州图书馆</B>");
                                     //content = Regex.Replace(content,@"<br>|<br */>","\n");
                                     //content = Regex.Replace(content, @"</p>|</P>", "\n");
                                     //content = Regex.Replace(content, @"<[^<>]+?>", "");

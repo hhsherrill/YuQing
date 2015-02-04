@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
+using System.Collections.Generic;
+using System.Web;
 
 namespace szlibInfoUtil
 {
@@ -161,5 +163,7 @@ namespace szlibInfoUtil
             code += int.Parse(tmp, NumberStyles.AllowHexSpecifier);
             return (char)code;
         }
+
+        
     }
 }

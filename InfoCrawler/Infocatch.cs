@@ -13,7 +13,7 @@ namespace InfoCrawler
     public partial class Infocatch : Form
     {
         private baiduThread m_baiduThread;
-        private szlibMeitiThread m_szlibMeitiThread;
+        //private szlibMeitiThread m_szlibMeitiThread;
         private sinablogThread m_sinablogThread;
         private ClientHanShanWenZhong.Client m_hswzThread;
         private ClientZhongGuoSuZhou.Client m_zgszThread;
@@ -29,8 +29,8 @@ namespace InfoCrawler
             m_baiduThread = new baiduThread();
             m_baiduThread.Start();
 
-            m_szlibMeitiThread = new szlibMeitiThread();
-            m_szlibMeitiThread.Start();
+            //m_szlibMeitiThread = new szlibMeitiThread();
+            //m_szlibMeitiThread.Start();
 
             m_sinablogThread = new sinablogThread();
             m_sinablogThread.Start();
@@ -60,7 +60,7 @@ namespace InfoCrawler
         private void Infocatch_FormClosing(object sender, FormClosingEventArgs e)
         {
             m_baiduThread.Abort();
-            m_szlibMeitiThread.Abort();
+            //m_szlibMeitiThread.Abort();
             m_sinablogThread.Abort();
             m_hswzThread.Abort();
             m_zgszThread.Abort();
