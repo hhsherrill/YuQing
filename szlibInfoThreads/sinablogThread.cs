@@ -40,11 +40,12 @@ namespace szlibInfoThreads
                 try
                 {
                     //获取页面
-                    string webcontent = getWebContent.Fetch(m_url);
+                    string webcontent = getWebContent.Fetch(m_url);                    
                     //获取博客列表
                     List<string> blogList = getBlogs(webcontent);
                     foreach (string blog in blogList)
                     {
+                        //MessageBox.Show(blog);
                         try
                         {
                             string blogurl = null;
@@ -87,7 +88,7 @@ namespace szlibInfoThreads
                                 if (match3.Success)
                                 {
                                     content = match3.Groups["content"].Value;                                    
-                                    string imgPat = @"<img[\s\S]*?real_src[ ]*=[""'](?<img>[^""'>#]+?)[""'][\s\S]*?/>";
+                                    string imgPat = @"<img[\s\S]*?real_src[ ]*=[""'](?<img>[^""'>#]+?)[""'][\s\S]*?>";
                                     MatchCollection mc = Regex.Matches(content, imgPat);
                                     if (mc != null && mc.Count > 0)
                                     {

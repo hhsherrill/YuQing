@@ -12,6 +12,8 @@ using System.Threading;
 using System.Web;
 using System.Windows.Forms;
 using szlibInfoUtil;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ClientSinaWeibo
 {
@@ -74,8 +76,15 @@ namespace ClientSinaWeibo
                                 if (timeMatch.Success) time = timeMatch.Groups["time"].Value;
 
                                 string content = Regex.Replace(topic,@"<div class=""WB_screen W_fr"">[\s\S]+?</div></div></div>","");
-                                content = Regex.Replace(content, @"<a[^<>]*?href=['""][^'""<>]+?['""][^<>]*?>", "");
-                                content = content.Replace("</a>","");
+                                /////评论列表
+                                string comments = http.GetHtml("http://www.weibo.com/aj/v6/comment/small?ajwvr=6&act=list&mid=" + topicid);
+                                if (comments != null){
+                                    JObject jo = (JObject)JsonConvert.DeserializeObject(comments);
+                                    content = content.Replace(@"<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div>", @"<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;"">" + jo["data"]["html"].ToString().Replace("\\n","").Replace("\\\"","\"").Replace("\\/","/")+"</div>");
+                                }
+                                //////////////////////////////
+                                //content = Regex.Replace(content, @"<a[^<>]*?href=['""][^'""<>]+?['""][^<>]*?>", "");
+                                //content = content.Replace("</a>","");
                                 SQLServerUtil.addNews(topicid, null, Utility.Encode(content), time, source, null, "新浪微博", null, DateTime.Now.ToString(), DateTime.Now.ToString());
                             }
                             //topic为下一页
