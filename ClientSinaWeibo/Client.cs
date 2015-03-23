@@ -57,6 +57,7 @@ namespace ClientSinaWeibo
                         try
                         {
                             string topic = topiclist[i];
+                            //MessageBox.Show(topic);
                             string topicid = null;  //微博id
                             string topicidPat = @"<div mid=""(?<topicid>\d+?)""";
                             Match topicidMatch = Regex.Match(topic,topicidPat);
@@ -101,7 +102,7 @@ namespace ClientSinaWeibo
                                     html = Regex.Replace(html, "\\s{3,}", "");
                                     html = html.Replace("\r", "").Replace("\n", "").Replace("\\n", "").Replace("\\t", "").Replace("\\\"", "\"").Replace("\\/", "/").Replace("&amp;", "&");
 
-                                    string pat = @"<div class=""WB_cardwrap S_bg2 clearfix"">(?<topic>[\s\S]+?<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div></div>)</div>";
+                                    string pat = @"<div class=""WB_cardwrap S_bg2 clearfix"" *>(?<topic>[\s\S]+?<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div></div>)</div>";
                                     MatchCollection mc = Regex.Matches(html, pat);
                                     foreach (Match m in mc)
                                     {
@@ -117,7 +118,7 @@ namespace ClientSinaWeibo
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e.Message);
+                            Console.WriteLine(this.ToString() + e.Message);
                         }
                     }
                     Thread.Sleep(3 * 60 * 60 * 1000);//每隔3小时执行一次
@@ -128,7 +129,7 @@ namespace ClientSinaWeibo
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(this.ToString() + e.Message);
                     Thread.Sleep(5 * 1000);
                 }
             }
@@ -171,12 +172,12 @@ namespace ClientSinaWeibo
             html = http.GetHtml(string.Format("http://s.weibo.com/wb/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
                 ,HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")),year2,month2,day2,year1,month1,day1));
             //html = http.GetHtml(string.Format("http://s.weibo.com/wb/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
-            //    , HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")), "2015", "01", "15", "2015", "01", "16"));
+            //    , HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")), "2015", "03", "20", "2015", "03", "22"));
             html = Utility.ascii2Native(html);
             html = Regex.Replace(html, "\\s{3,}", "");
             html = html.Replace("\r", "").Replace("\n", "").Replace("\\n", "").Replace("\\t", "").Replace("\\\"", "\"").Replace("\\/", "/").Replace("&amp;","&");
-
-            string pat = @"<div class=""WB_cardwrap S_bg2 clearfix"">(?<topic>[\s\S]+?<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div></div>)</div>";
+            //MessageBox.Show(html);
+            string pat = @"<div class=""WB_cardwrap S_bg2 clearfix"" *>(?<topic>[\s\S]+?<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div></div>)</div>";
             MatchCollection mc = Regex.Matches(html, pat);
             foreach (Match m in mc)
             {

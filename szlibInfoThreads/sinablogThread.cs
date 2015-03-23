@@ -20,7 +20,7 @@ namespace szlibInfoThreads
 
         public sinablogThread()
         {
-            m_thread = new Thread(sinablogThread.DoWork);
+            m_thread = new Thread(DoWork);
         }
 
         public void Start()
@@ -33,7 +33,7 @@ namespace szlibInfoThreads
             m_thread.Abort();
         }
 
-        public static void DoWork(object data)
+        public void DoWork(object data)
         {
             while (true)
             {
@@ -113,7 +113,7 @@ namespace szlibInfoThreads
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e.Message);
+                            Console.WriteLine(this.ToString() + e.Message);
                         }
                     }
                     Thread.Sleep(3 * 60 * 60 * 1000);//每隔3小时执行一次
@@ -124,7 +124,8 @@ namespace szlibInfoThreads
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(this.ToString() + e.Message);
+                    Thread.Sleep(5 * 1000);
                 }
             }
         }

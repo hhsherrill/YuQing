@@ -87,7 +87,7 @@ namespace ClientHuiKe
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        Console.WriteLine(this.ToString() + e.Message);
                     }
                 }
                 Thread.Sleep(3 * 60 * 60 * 1000);//每隔3小时执行一次
@@ -98,7 +98,8 @@ namespace ClientHuiKe
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(this.ToString() + e.Message);
+                Thread.Sleep(5 * 1000);
             }
 
         }

@@ -65,18 +65,21 @@ namespace szlibInfoThreads
                                 Match match2 = Regex.Match(newsitem, titlepat);
                                 string newstitle = null;
                                 if (match2.Success) newstitle = match2.Value.Substring(match2.Value.IndexOf('>') + 1, match2.Value.IndexOf('<') - match2.Value.IndexOf('>') - 1);
-
+                                
                                 string webname = null;
                                 string time = null;
                                 string reprintPat = @"<p class=""c-author"">([^<>])+</p>";
                                 Match match3 = Regex.Match(newsitem, reprintPat);
                                 string reprintData = null;
                                 if (match3.Success) reprintData = match3.Value.Substring(match3.Value.IndexOf('>') + 1, match3.Value.LastIndexOf('<') - match3.Value.IndexOf('>') - 1);
-                                Match match4 = Regex.Match(reprintData, @"(\d{4}-\d{2}-\d{2}[ ]*\d{2}:\d{2})");
+                                
+                                Match match4 = Regex.Match(reprintData, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
                                 if (match4.Success) time = match4.Value;
+                                
                                 webname = reprintData.Replace(time, "").Replace("&nbsp;", "");
-                                time = Regex.Replace(time, "\\s{2,}", " ");
-
+                                //time = Regex.Replace(time, "\\s{2,}", " ");
+                                time = time.Replace("年", "-").Replace("月", "-").Replace("日", "");
+                                
                                 if (newstitle != null && SQLServerUtil.existNewsTitle(newstitle) != null)
                                 {
                                     SQLServerUtil.updateReprint(SQLServerUtil.existNewsTitle(newstitle), webname, time);
@@ -116,11 +119,12 @@ namespace szlibInfoThreads
                                     List<string> reprintlist = getReprints(reprintsHtml);
                                     foreach (string reprint in reprintlist)
                                     {
-                                        Match match7 = Regex.Match(reprint, @"(\d{4}-\d{2}-\d{2}[ ]*\d{2}:\d{2})");
+                                        Match match7 = Regex.Match(reprint, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
                                         string reprinttime = null;
                                         if (match7.Success) { reprinttime = match7.Value; }
                                         string reprintsource = reprint.Replace(reprinttime, "").Replace("&nbsp;", "");
-                                        reprinttime = Regex.Replace(reprinttime, "\\s{2,}", " ");
+                                        //reprinttime = Regex.Replace(reprinttime, "\\s{2,}", " ");
+                                        reprinttime = reprinttime.Replace("年", "-").Replace("月", "-").Replace("日", "");
                                         SQLServerUtil.updateReprint(newsid, reprintsource, reprinttime);
                                     }
                                 }
@@ -128,7 +132,7 @@ namespace szlibInfoThreads
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e.Message);
+                            Console.WriteLine(this.ToString()+e.Message);
                         }
                     }
                     Thread.Sleep(3 * 60 * 60 * 1000);//每隔3小时执行一次
@@ -140,7 +144,8 @@ namespace szlibInfoThreads
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(this.ToString() + e.Message);
+                    Thread.Sleep(5 * 1000);
                 }
             }            
         }
