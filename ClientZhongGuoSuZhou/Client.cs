@@ -57,7 +57,7 @@ namespace ClientZhongGuoSuZhou
                                 if (SQLServerUtil.existNewsId(topicid)) continue;
                                 string topictitle = topic.Substring(topic.IndexOf('>') + 1, topic.IndexOf("</a>") - topic.IndexOf('>') - 1);
                                 //搜索结果存在相同文章，只保存一次
-                                if (topictitle != null && SQLServerUtil.existNewsTitle(topictitle) != null) continue;
+                                if (topictitle != null && SQLServerUtil.existNewsTitle(topictitle, "中国苏州网") != null) continue;
                                 string time = topic.Substring(topic.IndexOf("</a>")+4).Replace(" ","").Trim('[', ']');
                                 string contentHTML = http.GetHtml(topicurl);
                                 //MessageBox.Show(contentHTML);                               

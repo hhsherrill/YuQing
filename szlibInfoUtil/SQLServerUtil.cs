@@ -34,14 +34,14 @@ namespace szlibInfoUtil
         }
 
         //查重，如果存在相同标题的新闻，返回此前存储的新闻id
-        public static string existNewsTitle(string newstitle)
+        public static string existNewsTitle(string newstitle,string category)
         {
             string result = null;
             try
             {
                 SqlConnection conn = new SqlConnection(strconn);
                 conn.Open();
-                string s = "select * from newsInfo where title='" + newstitle + "'";
+                string s = "select * from newsInfo where title='" + newstitle + "' and category='"+category+"'";
                 SqlCommand cmd = new SqlCommand(s, conn);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.Read()) result = dr.GetValue(0).ToString();

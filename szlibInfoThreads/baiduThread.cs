@@ -56,78 +56,152 @@ namespace szlibInfoThreads
                             if (newsurl != null)
                             {
                                 string newsid = Utility.Hash(newsurl);
-                                //如果库中已有该链接，表示已抓取过，后面的不用再抓取
-                                if (SQLServerUtil.existNewsId(newsid)) break;
-                                //判断标题是否在库中，如已在，更新转载记录
                                 string newsitem = news;
                                 newsitem = newsitem.Replace("<em>", "").Replace("</em>", "");
-                                string titlepat = @"target=""_blank""[ ]*>([^<>])+</a></h3>";
-                                Match match2 = Regex.Match(newsitem, titlepat);
-                                string newstitle = null;
-                                if (match2.Success) newstitle = match2.Value.Substring(match2.Value.IndexOf('>') + 1, match2.Value.IndexOf('<') - match2.Value.IndexOf('>') - 1);
-                                
-                                string webname = null;
-                                string time = null;
-                                string reprintPat = @"<p class=""c-author"">([^<>])+</p>";
-                                Match match3 = Regex.Match(newsitem, reprintPat);
-                                string reprintData = null;
-                                if (match3.Success) reprintData = match3.Value.Substring(match3.Value.IndexOf('>') + 1, match3.Value.LastIndexOf('<') - match3.Value.IndexOf('>') - 1);
-                                
-                                Match match4 = Regex.Match(reprintData, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
-                                if (match4.Success) time = match4.Value;
-                                
-                                webname = reprintData.Replace(time, "").Replace("&nbsp;", "");
-                                //time = Regex.Replace(time, "\\s{2,}", " ");
-                                time = time.Replace("年", "-").Replace("月", "-").Replace("日", "");
-                                
-                                if (newstitle != null && SQLServerUtil.existNewsTitle(newstitle) != null)
+                                //如果库中已有该链接，表示已抓取过，更新转载
+                                if (SQLServerUtil.existNewsId(newsid))
                                 {
-                                    SQLServerUtil.updateReprint(SQLServerUtil.existNewsTitle(newstitle), webname, time);
-                                }
-                                //标题不存在，添加到库里
-                                else
-                                {
-                                    //用百度快照来读
-                                    string cacheurlPat = @"<a href=""(?<cacheurl>[^""'<>#]+?)""[^<>]+?>百度快照</a>";
-                                    Match cacheurlMatch = Regex.Match(newsitem,cacheurlPat);
-                                    string cacheurl=null;
-                                    if (cacheurlMatch.Success) cacheurl = cacheurlMatch.Groups["cacheurl"].Value.Replace("&amp;","&");
-                                    string content = null;
-                                    if (cacheurl != null) content = getWebContent.Fetch(cacheurl);
-                                    if(content==null||content.Length<500) content = getWebContent.Fetch(newsurl);
-                                    content = Regex.Replace(content,@"<!--[\s\S]*?--!>","");
-                                    content = Regex.Replace(content, "\\s{3,}", "");
-                                    content = content.Replace("\r", "");
-                                    content = content.Replace("\n", "");
-                                    content = content.Replace("苏州图书馆", "<B style=\"color:red\">苏州图书馆</B>");
-                                    string source = null;
-                                    Match sourcematch = Regex.Match(content,@"来源： *(?<source>[^<> ]+?)[ <]");
-                                    if (sourcematch.Success) source = sourcematch.Groups["source"].Value;
-                                    if (source == null) source = webname;
-                                    SQLServerUtil.addNews(newsid, newstitle, Utility.Encode(content), time, source, newsurl, "百度新闻", null, DateTime.Now.ToString(), DateTime.Now.ToString());
-                                    if(source!=webname) SQLServerUtil.updateReprint(newsid, source, time);
-                                }
-                                //是否有相同新闻转载
-                                string reprintsPat = @"<a href[ ]*=[ ]*[""']([^""'#>])+[""'][^<>]*>\d+条相同新闻";
-                                Match match6 = Regex.Match(newsitem, reprintsPat);
-                                if (match6.Success)
-                                {
-                                    string tempstr = match6.Value.Substring(match6.Value.IndexOf('"') + 1);
-                                    string reprintsUrl = base_url + tempstr.Substring(0, tempstr.IndexOf('"') + 1);
-                                    //MessageBox.Show(reprintsUrl);
-                                    string reprintsHtml = getWebContent.Fetch(reprintsUrl);
-                                    List<string> reprintlist = getReprints(reprintsHtml);
-                                    foreach (string reprint in reprintlist)
+                                    string reprintsPat = @"<a href[ ]*=[ ]*[""']([^""'#>])+[""'][^<>]*>\d+条相同新闻";
+                                    Match match6 = Regex.Match(newsitem, reprintsPat);
+                                    if (match6.Success)
                                     {
-                                        Match match7 = Regex.Match(reprint, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
-                                        string reprinttime = null;
-                                        if (match7.Success) { reprinttime = match7.Value; }
-                                        string reprintsource = reprint.Replace(reprinttime, "").Replace("&nbsp;", "");
-                                        //reprinttime = Regex.Replace(reprinttime, "\\s{2,}", " ");
-                                        reprinttime = reprinttime.Replace("年", "-").Replace("月", "-").Replace("日", "");
-                                        SQLServerUtil.updateReprint(newsid, reprintsource, reprinttime);
+                                        string tempstr = match6.Value.Substring(match6.Value.IndexOf('"') + 1);
+                                        string reprintsUrl = base_url + tempstr.Substring(0, tempstr.IndexOf('"') + 1);
+                                        //MessageBox.Show(reprintsUrl);
+                                        string reprintsHtml = getWebContent.Fetch(reprintsUrl);
+                                        List<string> reprintlist = getReprints(reprintsHtml);
+                                        foreach (string reprint in reprintlist)
+                                        {
+                                            string reprintsource = reprint.Substring(0, reprint.IndexOf("&nbsp;&nbsp;"));
+                                            string reprinttime = null;  //时间
+                                            string reprinttimestring = reprint.Replace(reprintsource, "").Replace("&nbsp;", "");
+                                            Match match7 = Regex.Match(reprinttimestring, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
+                                            if (match7.Success)
+                                            {
+                                                reprinttime = match7.Value;
+                                                reprinttime = reprinttime.Replace("年", "-").Replace("月", "-").Replace("日", "");
+                                            }
+                                            else
+                                            {
+                                                match7 = Regex.Match(reprinttimestring, @"(?<hour>\d{1,2})小时");
+                                                if (match7.Success) reprinttime = DateTime.Now.AddHours(0 - Convert.ToInt16(match7.Groups["hour"].Value.ToString())).ToString();
+                                                else
+                                                {
+                                                    match7 = Regex.Match(reprinttimestring, @"(?<minute>\d{1,2})分钟");
+                                                    if (match7.Success) reprinttime = DateTime.Now.AddMinutes(0 - Convert.ToInt16(match7.Groups["minute"].Value.ToString())).ToString();
+                                                }
+                                            }
+                                            if (reprinttime == null) reprinttime = DateTime.Now.ToString();
+                                            SQLServerUtil.updateReprint(newsid, reprintsource, reprinttime);
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    //判断标题是否在库中，如已在，更新转载记录                                  
+                                    //标题
+                                    string titlepat = @"target=""_blank""[ ]*>([^<>])+</a></h3>";
+                                    Match match2 = Regex.Match(newsitem, titlepat);
+                                    string newstitle = null;
+                                    if (match2.Success) newstitle = match2.Value.Substring(match2.Value.IndexOf('>') + 1, match2.Value.IndexOf('<') - match2.Value.IndexOf('>') - 1);
+
+                                    string webname = null;    //网站                           
+                                    string reprintPat = @"<p class=""c-author"">([^<>])+</p>";
+                                    Match match3 = Regex.Match(newsitem, reprintPat);
+                                    string reprintData = null;
+                                    if (match3.Success) reprintData = match3.Value.Substring(match3.Value.IndexOf('>') + 1, match3.Value.LastIndexOf('<') - match3.Value.IndexOf('>') - 1);
+                                    webname = reprintData.Substring(0, reprintData.IndexOf("&nbsp;&nbsp;"));
+
+                                    string time = null;  //时间
+                                    string timestring = reprintData.Replace(webname, "").Replace("&nbsp;", "");
+                                    Match match4 = Regex.Match(timestring, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
+                                    if (match4.Success)
+                                    {
+                                        time = match4.Value;
+                                        time = time.Replace("年", "-").Replace("月", "-").Replace("日", "");
+                                    }
+                                    else
+                                    {
+                                        match4 = Regex.Match(timestring, @"(?<hour>\d{1,2})小时");
+                                        if (match4.Success) time = DateTime.Now.AddHours(0 - Convert.ToInt16(match4.Groups["hour"].Value.ToString())).ToString();
+                                        else
+                                        {
+                                            match4 = Regex.Match(timestring, @"(?<minute>\d{1,2})分钟");
+                                            if (match4.Success) time = DateTime.Now.AddMinutes(0 - Convert.ToInt16(match4.Groups["minute"].Value.ToString())).ToString();
+                                        }
+                                    }
+                                    if (time == null) time = DateTime.Now.ToString();
+
+                                    if (newstitle != null && SQLServerUtil.existNewsTitle(newstitle,"百度新闻") != null)
+                                    {
+                                        SQLServerUtil.updateReprint(SQLServerUtil.existNewsTitle(newstitle, "百度新闻"), webname, time);
+                                    }
+                                    //标题不存在，添加到库里
+                                    else
+                                    {
+                                        //用百度快照来读
+                                        string cacheurlPat = @"<a href=""(?<cacheurl>[^""'<>#]+?)""[^<>]+?>百度快照</a>";
+                                        Match cacheurlMatch = Regex.Match(newsitem, cacheurlPat);
+                                        string cacheurl = null;
+                                        if (cacheurlMatch.Success) cacheurl = cacheurlMatch.Groups["cacheurl"].Value.Replace("&amp;", "&");
+                                        string content = null;
+                                        if (cacheurl != null) content = getWebContent.Fetch(cacheurl);
+                                        if (content == null || content.Length < 500) content = getWebContent.Fetch(newsurl);
+                                        content = Regex.Replace(content, @"<!--[\s\S]*?--!>", "");
+                                        content = Regex.Replace(content, "\\s{3,}", "");
+                                        content = content.Replace("\r", "");
+                                        content = content.Replace("\n", "");
+                                        content = content.Replace("苏州图书馆", "<B style=\"color:red\">苏州图书馆</B>");
+                                        string source = null;
+                                        Match sourcematch = Regex.Match(content, @"来源： *(?<source>[^<> ]+?)[ <]");
+                                        if (sourcematch.Success) source = sourcematch.Groups["source"].Value;
+                                        if (source == null) source = webname;
+                                        SQLServerUtil.addNews(newsid, newstitle, Utility.Encode(content), time, source, newsurl, "百度新闻", null, DateTime.Now.ToString(), DateTime.Now.ToString());
+                                        if (source != webname) SQLServerUtil.updateReprint(newsid, source, time);
+                                    }
+                                    //是否有相同新闻转载
+                                    string reprintsPat = @"<a href[ ]*=[ ]*[""']([^""'#>])+[""'][^<>]*>\d+条相同新闻";
+                                    Match match6 = Regex.Match(newsitem, reprintsPat);
+                                    if (match6.Success)
+                                    {
+                                        string tempstr = match6.Value.Substring(match6.Value.IndexOf('"') + 1);
+                                        string reprintsUrl = base_url + tempstr.Substring(0, tempstr.IndexOf('"') + 1);
+                                        //MessageBox.Show(reprintsUrl);
+                                        string reprintsHtml = getWebContent.Fetch(reprintsUrl);
+                                        List<string> reprintlist = getReprints(reprintsHtml);
+                                        foreach (string reprint in reprintlist)
+                                        {
+                                            string reprintsource = reprint.Substring(0, reprint.IndexOf("&nbsp;&nbsp;"));
+                                            string reprinttime = null;  //时间
+                                            string reprinttimestring = reprint.Replace(reprintsource, "").Replace("&nbsp;", "");
+                                            Match match7 = Regex.Match(reprinttimestring, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
+                                            if (match7.Success)
+                                            {
+                                                reprinttime = match7.Value;
+                                                reprinttime = reprinttime.Replace("年", "-").Replace("月", "-").Replace("日", "");
+                                            }
+                                            else
+                                            {
+                                                match7 = Regex.Match(reprinttimestring, @"(?<hour>\d{1,2})小时");
+                                                if (match7.Success) reprinttime = DateTime.Now.AddHours(0 - Convert.ToInt16(match7.Groups["hour"].Value.ToString())).ToString();
+                                                else
+                                                {
+                                                    match7 = Regex.Match(reprinttimestring, @"(?<minute>\d{1,2})分钟");
+                                                    if (match7.Success) reprinttime = DateTime.Now.AddMinutes(0 - Convert.ToInt16(match7.Groups["minute"].Value.ToString())).ToString();
+                                                }
+                                            }
+                                            if (reprinttime == null) reprinttime = DateTime.Now.ToString();
+
+                                            //Match match7 = Regex.Match(reprint, @"(\d{4}[年-]\d{2}[月-]\d{2}日?[ ]*\d{2}:\d{2})");
+                                            //string reprinttime = null;
+                                            //if (match7.Success) { reprinttime = match7.Value; }
+                                            //string reprintsource = reprint.Replace(reprinttime, "").Replace("&nbsp;", "");
+                                            //reprinttime = Regex.Replace(reprinttime, "\\s{2,}", " ");
+                                            //reprinttime = reprinttime.Replace("年", "-").Replace("月", "-").Replace("日", "");
+                                            SQLServerUtil.updateReprint(newsid, reprintsource, reprinttime);
+                                        }
+                                    }
+                                }                                
                             }
                         }
                         catch (Exception e)
