@@ -169,10 +169,10 @@ namespace ClientSinaWeibo
             string month2 = yesterday.ToString("MM");
             string day2 = yesterday.ToString("dd");
 
-            html = http.GetHtml(string.Format("http://s.weibo.com/wb/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
+            html = http.GetHtml(string.Format("http://s.weibo.com/weibo/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
                 ,HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")),year2,month2,day2,year1,month1,day1));
-            //html = http.GetHtml(string.Format("http://s.weibo.com/wb/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
-            //    , HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")), "2015", "03", "20", "2015", "03", "22"));
+            //html = http.GetHtml(string.Format("http://s.weibo.com/weibo/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
+            //    , HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")), "2015", "04", "15", "2015", "04", "20"));
             html = Utility.ascii2Native(html);
             html = Regex.Replace(html, "\\s{3,}", "");
             html = html.Replace("\r", "").Replace("\n", "").Replace("\\n", "").Replace("\\t", "").Replace("\\\"", "\"").Replace("\\/", "/").Replace("&amp;","&");

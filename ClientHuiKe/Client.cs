@@ -111,6 +111,10 @@ namespace ClientHuiKe
             string year = today.ToString("yyyy");
             string month = today.ToString("MM");
             string day = today.ToString("dd");
+            DateTime from = today.AddMonths(-1); //一个月
+            string fromyear = from.ToString("yyyy");
+            string frommonth = from.ToString("MM");
+            string fromday = from.ToString("dd");
             List<string> topiclist = new List<string>();
             String webcontent;
             
@@ -120,14 +124,14 @@ namespace ClientHuiKe
             
             http.GetHtml("http://wisenews.wisers.net/?gid=SZLIBCN&user=ipaccess");
             http.GetHtml("http://wisesearch.wisers.net/");
-            string postData1 = string.Format("defaultTemplate=&searchQueryFormUpdated=true&type=&template-name=&curr-template-name=&content-locale=zh_CN&search-action=&sort-order-list=DESC%3Adate&from-date={1}{2}{3}&to-date={1}{2}{3}&date-range=PUB%3A{1}.{2}.{3}-{1}.{2}.{3}&included-publication-uids=&excluded-publication-uids=&included-listedcompany-uids=&excluded-listedcompany-uids=&included-adind-uids=&excluded-adind-uids=&included-adbrand-uids=&excluded-adbrand-uids=&hot-picks=&search_doc_type=news-only&search-query-string={0}&use-thesaurus=true&by-scope=headline%2Bcontent&within-scope=document&date-range-from-year={1}&date-range-from-month={2}&date-range-from-day={3}&date-range-to-year={1}&date-range-to-month={2}&date-range-to-day={3}&date-range-period=today&search_region=&search_source=&search_type=&select_pub_name=&delete_pub_name=&search_source_input=%C7%EB%CA%E4%C8%EB%C3%BD%CC%E5%C3%FB%D7%D6%A3%AC%C0%FD%C8%E7%A3%BA%C4%CF%B7%BD%B6%BC%CA%D0%B1%A8&template-name-new-radio=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+2&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+3&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+4&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+5&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+6&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+7&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+8&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+9&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+10&language=all&author_name=&column_name=&section_name=&listedcompany-include-op=or", HttpUtility.UrlEncode("苏州图书馆", Encoding.GetEncoding("gbk")),year,month,day);
+            string postData1 = string.Format("defaultTemplate=&searchQueryFormUpdated=true&type=&template-name=&curr-template-name=&content-locale=zh_CN&search-action=&sort-order-list=DESC%3Adate&from-date={1}{2}{3}&to-date={4}{5}{6}&date-range=PUB%3A{1}.{2}.{3}-{4}.{5}.{6}&included-publication-uids=&excluded-publication-uids=&included-listedcompany-uids=&excluded-listedcompany-uids=&included-adind-uids=&excluded-adind-uids=&included-adbrand-uids=&excluded-adbrand-uids=&hot-picks=&search_doc_type=news-only&search-query-string={0}&use-thesaurus=true&by-scope=headline%2Bcontent&within-scope=document&date-range-from-year={1}&date-range-from-month={2}&date-range-from-day={3}&date-range-to-year={4}&date-range-to-month={5}&date-range-to-day={6}&date-range-period=last-month&search_region=&search_source=&search_type=&select_pub_name=&delete_pub_name=&search_source_input=%C7%EB%CA%E4%C8%EB%C3%BD%CC%E5%C3%FB%D7%D6%A3%AC%C0%FD%C8%E7%A3%BA%C4%CF%B7%BD%B6%BC%CA%D0%B1%A8&template-name-new-radio=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+1&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+2&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+3&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+4&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+5&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+6&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+7&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+8&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+9&template-name-new=%CB%D1%CB%F7%CF%EE%C4%BF+10&language=all&author_name=&column_name=&section_name=&listedcompany-include-op=or", HttpUtility.UrlEncode("苏州图书馆", Encoding.GetEncoding("gbk")), fromyear,frommonth,fromday,year,month,day);
             http.Post("http://cn.wisesearch.wisers.net/cnws/search.do", postData1);
             webcontent = http.GetHtml("http://cn.wisesearch.wisers.net/cnws/FULL-CONTENT-DOCUMENT-BODY.do?is_expo=&adhoc-clip-folder-id=search-result&narrow-publication-scope=default");
-            
+            //Console.Write(webcontent);
             webcontent = Regex.Replace(webcontent, "\\s{3,}", "");
             webcontent = webcontent.Replace("\r", "");
             webcontent = webcontent.Replace("\n", "");
-            //MessageBox.Show(webcontent);
+            
             string pat = @"<tr valign='top' onMouseOut=""mouseout\(this\);"" *>(?<topic>[\s\S]+?)</tr>";
             MatchCollection mc = Regex.Matches(webcontent, pat);
             foreach (Match m in mc)
