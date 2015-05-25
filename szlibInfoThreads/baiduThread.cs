@@ -17,7 +17,8 @@ namespace szlibInfoThreads
     public class baiduThread
     {
         private Thread m_thread;
-        private static string m_url = "http://news.baidu.com/ns?word=%CB%D5%D6%DD%CD%BC%CA%E9%B9%DD&bs=%CB%D5%D6%DD%CD%BC%CA%E9%B9%DD&sr=0&cl=2&rn=20&tn=news&ct=0&clk=sortbytime";
+        //private static string m_url = "http://news.baidu.com/ns?word=%CB%D5%D6%DD%CD%BC%CA%E9%B9%DD&bs=%CB%D5%D6%DD%CD%BC%CA%E9%B9%DD&sr=0&cl=2&rn=20&tn=news&ct=0&clk=sortbytime";
+        private static string m_url = "http://news.baidu.com/ns?from=news&cl=2&bt={3}&y0={0}&m0={1}&d0={2}&y1={0}&m1={1}&d1={2}&et={4}&q1=%CB%D5%D6%DD%CD%BC%CA%E9%B9%DD&submit=%B0%D9%B6%C8%D2%BB%CF%C2&q3=&q4=&mt=0&lm=&s=2&begin_date={0}-{1}-{2}&end_date={0}-{1}-{2}&tn=newsdy&ct1=0&ct=0&rn=20&q6=";
         private static string base_url = "http://news.baidu.com";
 
         public baiduThread()
@@ -40,8 +41,16 @@ namespace szlibInfoThreads
             while (true){
                 try
                 {
+                    DateTime yesterday = DateTime.Today.AddDays(-1);
+                    string year = yesterday.ToString("yyyy");
+                    string month = yesterday.ToString("MM");
+                    string day = yesterday.ToString("dd");
+                    string bt = ((yesterday - new DateTime(1970, 1, 1)).TotalSeconds-28800).ToString();
+                    string et = ((DateTime.Today.AddSeconds(-1) - new DateTime(1970, 1, 1)).TotalSeconds-28800).ToString();
+ 
                     //获取页面
-                    string webcontent = getWebContent.Fetch(m_url);
+                    string webcontent = getWebContent.Fetch(string.Format(m_url,year,month,day,bt,et));
+
                     //获取新闻列表
                     List<string> newslist = getNews(webcontent);
                     foreach (string news in newslist)
@@ -98,9 +107,9 @@ namespace szlibInfoThreads
                                 }
                                 else
                                 {
-                                    //判断标题是否在库中，如已在，更新转载记录                                  
+                                    /*//判断标题是否在库中，如已在，更新转载记录*/                                 
                                     //标题
-                                    string titlepat = @"target=""_blank""[ ]*>([^<>])+</a></h3>";
+                                    string titlepat = @"target=""_blank""[ ]*>([^<>])+</a></h3>";  //标题
                                     Match match2 = Regex.Match(newsitem, titlepat);
                                     string newstitle = null;
                                     if (match2.Success) newstitle = match2.Value.Substring(match2.Value.IndexOf('>') + 1, match2.Value.IndexOf('<') - match2.Value.IndexOf('>') - 1);
@@ -132,13 +141,13 @@ namespace szlibInfoThreads
                                     }
                                     if (time == null) time = DateTime.Now.ToString();
 
-                                    if (newstitle != null && SQLServerUtil.existNewsTitle(newstitle,"百度新闻") != null)
+                                    /*if (newstitle != null && SQLServerUtil.existNewsTitle(newstitle,"百度新闻") != null)
                                     {
                                         SQLServerUtil.updateReprint(SQLServerUtil.existNewsTitle(newstitle, "百度新闻"), webname, time);
-                                    }
-                                    //标题不存在，添加到库里
-                                    else
-                                    {
+                                    }*/
+                                    /*//标题不存在，添加到库里*/
+                                    //else
+                                    //{
                                         //用百度快照来读
                                         string cacheurlPat = @"<a href=""(?<cacheurl>[^""'<>#]+?)""[^<>]+?>百度快照</a>";
                                         Match cacheurlMatch = Regex.Match(newsitem, cacheurlPat);
@@ -154,11 +163,11 @@ namespace szlibInfoThreads
                                         content = content.Replace("苏州图书馆", "<B style=\"color:red\">苏州图书馆</B>");
                                         string source = null;
                                         Match sourcematch = Regex.Match(content, @"来源： *(?<source>[^<> ]+?)[ <]");
-                                        if (sourcematch.Success) source = sourcematch.Groups["source"].Value;
+                                        if (sourcematch.Success) source = sourcematch.Groups["source"].Value.Replace("&nbsp;"," ").Trim();
                                         if (source == null) source = webname;
                                         SQLServerUtil.addNews(newsid, newstitle, Utility.Encode(content), time, source, newsurl, "百度新闻", null, DateTime.Now.ToString(), DateTime.Now.ToString());
-                                        if (source != webname) SQLServerUtil.updateReprint(newsid, source, time);
-                                    }
+                                        if (source != webname) SQLServerUtil.updateReprint(newsid, webname, time);
+                                    //}
                                     //是否有相同新闻转载
                                     string reprintsPat = @"<a href[ ]*=[ ]*[""']([^""'#>])+[""'][^<>]*>\d+条相同新闻";
                                     Match match6 = Regex.Match(newsitem, reprintsPat);

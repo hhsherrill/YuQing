@@ -51,8 +51,9 @@ namespace ClientSinaWeibo
                 {
                     //获取信息列表
                     List<string> topiclist = getTopics();
+                    //MessageBox.Show(topiclist.Count.ToString());
+                    //foreach (string t in topiclist) MessageBox.Show(t);
                     for(int i=0;i<topiclist.Count;i++)
-                    //foreach (string topic in topiclist)
                     {
                         try
                         {
@@ -172,11 +173,12 @@ namespace ClientSinaWeibo
             html = http.GetHtml(string.Format("http://s.weibo.com/weibo/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
                 ,HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")),year2,month2,day2,year1,month1,day1));
             //html = http.GetHtml(string.Format("http://s.weibo.com/weibo/{0}&xsort=time&timescope=custom:{1}-{2}-{3}-0:{4}-{5}-{6}-0&nodup=1"
-            //    , HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")), "2015", "04", "15", "2015", "04", "20"));
+            //    , HttpUtility.UrlEncode(HttpUtility.UrlEncode("苏州图书馆")), "2015", "05", "17", "2015", "05", "18"));
             html = Utility.ascii2Native(html);
             html = Regex.Replace(html, "\\s{3,}", "");
             html = html.Replace("\r", "").Replace("\n", "").Replace("\\n", "").Replace("\\t", "").Replace("\\\"", "\"").Replace("\\/", "/").Replace("&amp;","&");
             //MessageBox.Show(html);
+            if (html.Contains("抱歉，未找到“苏州图书馆”相关结果。")) return topiclist;
             string pat = @"<div class=""WB_cardwrap S_bg2 clearfix"" *>(?<topic>[\s\S]+?<div node-type=""feed_list_repeat"" class=""WB_feed_repeat S_bg1"" style=""display:none;""></div></div>)</div>";
             MatchCollection mc = Regex.Matches(html, pat);
             foreach (Match m in mc)
